@@ -1,3 +1,4 @@
+import { Response } from 'express';
 
 export const handleControllerError = (
     error: unknown,

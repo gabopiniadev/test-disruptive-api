@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {generateQRCode} from "../utils/qrGeneratorCode";
+import { generateQRCode } from "../utils/qrGeneratorCode";
 
 const API_URL = 'https://my.disruptivepayments.io/api';
 const CLIENT_API = 'o0z8y85rjdx28iqef32f4mrl6e56b71742437588342';
@@ -20,17 +20,19 @@ export const createPaymentService = async (fundsGoal: number) => {
             }
         );
 
-        const { address } = response.data.data;
+        const { address, network } = response.data.data;
         const qrCode = await generateQRCode(address);
 
         return {
             qrCode,
             address,
-            network: response.data.data.network,
-            fundsGoal: response.data.data.fundsGoal,
+            network,
+            fundsGoal,
         };
-    } catch (error) {
-        throw new Error(`Error creating payment: ${error.message}`);
+    } catch (error: any) {
+        throw new Error(
+            error.response?.data?.message || `Error creating payment: ${error.message || 'Unknown error'}`
+        );
     }
 };
 
@@ -39,9 +41,10 @@ export const checkPaymentStatusService = async (address: string) => {
         const response = await axios.get(`${API_URL}/payments/status/${address}`, {
             headers: { Authorization: `Bearer ${CLIENT_API}` },
         });
-
         return response.data;
-    } catch (error) {
-        throw new Error(`Failed to check payment status: ${error.message}`);
+    } catch (error: any) {
+        throw new Error(
+            error.response?.data?.message || `Failed to check payment status: ${error.message || 'Unknown error'}`
+        );
     }
 };
