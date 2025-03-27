@@ -9,7 +9,7 @@ export const createPaymentService = async (fundsGoal: number) => {
         console.log('Iniciando solicitud a la API externa', { fundsGoal });
 
         const response = await axios.post(
-            `${API_URL}/payments/create`,
+            `${API_URL}/payments/single`,
             {
                 network: 'BSC',
                 fundsGoal,
@@ -17,7 +17,7 @@ export const createPaymentService = async (fundsGoal: number) => {
             },
             {
                 headers: {
-                    Authorization: `Bearer ${CLIENT_API}`,
+                    "client-api-key": CLIENT_API,
                 },
             }
         );
@@ -49,9 +49,11 @@ export const createPaymentService = async (fundsGoal: number) => {
 
 export const checkPaymentStatusService = async (address: string) => {
     try {
-        const response = await axios.get(`${API_URL}/payments/status/${address}`, {
-            headers: { Authorization: `Bearer ${CLIENT_API}` },
+        console.log('Iniciando solicitud a la API externa para verificar el estado del pago', { address });
+        const response = await axios.get(`${API_URL}/payments/status?network=BSC&address=${address}`, {
+            headers: { "client-api-key": CLIENT_API },
         });
+        console.info('Respuesta de la API externa:', response.data);
         return response.data;
     } catch (error: any) {
         throw new Error(

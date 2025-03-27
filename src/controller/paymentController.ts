@@ -28,6 +28,7 @@ export const checkPaymentStatus = async (req: Request, res: Response): Promise<v
         }
 
         const status = await checkPaymentStatusService(address);
+        console.log("Status de pago:", status);
         res.json(status);
     } catch (error) {
         handleControllerError(error, res, 'Failed to check payment status');
