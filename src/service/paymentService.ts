@@ -6,6 +6,8 @@ const CLIENT_API = 'o0z8y85rjdx28iqef32f4mrl6e56b71742437588342';
 
 export const createPaymentService = async (fundsGoal: number) => {
     try {
+        console.log('Iniciando solicitud a la API externa', { fundsGoal });
+
         const response = await axios.post(
             `${API_URL}/payments/create`,
             {
@@ -20,7 +22,15 @@ export const createPaymentService = async (fundsGoal: number) => {
             }
         );
 
+        console.log('Respuesta de la API externa:', response.data);
+
         const { address, network } = response.data.data;
+        if (!address) {
+            throw new Error('API externa no devolvió la dirección del pago (address)');
+        }
+
+        console.log('Generando QR para la dirección:', address);
+
         const qrCode = await generateQRCode(address);
 
         return {
@@ -30,8 +40,9 @@ export const createPaymentService = async (fundsGoal: number) => {
             fundsGoal,
         };
     } catch (error: any) {
+        console.error('Error en createPaymentService:', error?.response?.data || error.message);
         throw new Error(
-            error.response?.data?.message || `Error creating payment: ${error.message || 'Unknown error'}`
+            error.response?.data?.message || `Error creando el pago: ${error.message || 'Error desconocido'}`
         );
     }
 };
